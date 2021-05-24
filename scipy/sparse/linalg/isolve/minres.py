@@ -12,15 +12,15 @@ def minres(A, b, x0=None, shift=0.0, tol=1e-5, maxiter=None,
     """
     Use MINimum RESidual iteration to solve Ax=b
 
-    MINRES minimizes norm(A*x - b) for a real symmetric matrix A.  Unlike
-    the Conjugate Gradient method, A can be indefinite or singular.
+    MINRES minimizes norm(A*x - b) for a real symmetric or Hermitian matrix A.
+    Unlike the Conjugate Gradient method, A can be indefinite or singular.
 
     If shift != 0 then the method solves (A - shift*I)x = b
 
     Parameters
     ----------
     A : {sparse matrix, dense matrix, LinearOperator}
-        The real symmetric N-by-N matrix of the linear system
+        The real symmetric or Hermitian N-by-N matrix of the linear system
         Alternatively, ``A`` can be a linear operator which can
         produce ``Ax`` using, e.g.,
         ``scipy.sparse.linalg.LinearOperator``.
@@ -130,7 +130,7 @@ def minres(A, b, x0=None, shift=0.0, tol=1e-5, maxiter=None,
     r1 = b - A*x
     y = psolve(r1)
 
-    beta1 = inner(r1, y)
+    beta1 = inner(r1.conjugate(), y)
 
     if beta1 < 0:
         raise ValueError('indefinite preconditioner')
@@ -145,8 +145,8 @@ def minres(A, b, x0=None, shift=0.0, tol=1e-5, maxiter=None,
         # see if A is symmetric
         w = matvec(y)
         r2 = matvec(w)
-        s = inner(w,w)
-        t = inner(y,r2)
+        s = inner(w.conjugate(), w)
+        t = inner(y.conjugate(), r2)
         z = abs(s - t)
         epsa = (s + eps) * eps**(1.0/3.0)
         if z > epsa:
@@ -154,8 +154,8 @@ def minres(A, b, x0=None, shift=0.0, tol=1e-5, maxiter=None,
 
         # see if M is symmetric
         r2 = psolve(y)
-        s = inner(y,y)
-        t = inner(r1,r2)
+        s = inner(y.conjugate(), y)
+        t = inner(r1.conjugate(), r2)
         z = abs(s - t)
         epsa = (s + eps) * eps**(1.0/3.0)
         if z > epsa:
@@ -196,14 +196,14 @@ def minres(A, b, x0=None, shift=0.0, tol=1e-5, maxiter=None,
         if itn >= 2:
             y = y - (beta/oldb)*r1
 
-        alfa = inner(v,y)
+        alfa = inner(v.conjugate(), y)
         y = y - (alfa/beta)*r2
         r1 = r2
         r2 = y
         y = psolve(r2)
         oldb = beta
-        beta = inner(r2,y)
-        if beta < 0:
+        beta = inner(r2.conjugate(), y)
+        if beta < 0.:
             raise ValueError('non-symmetric matrix')
         beta = sqrt(beta)
         tnorm2 += alfa**2 + oldb**2 + beta**2
