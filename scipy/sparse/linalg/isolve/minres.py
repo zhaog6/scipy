@@ -137,7 +137,7 @@ def minres(A, b, x0=None, shift=0.0, tol=1e-5, maxiter=None,
     elif beta1 == 0:
         return (postprocess(x), 0)
 
-    beta1 = sqrt(beta1)
+    beta1 = sqrt(abs(beta1))
 
     if check:
         # are these too strict?
@@ -205,7 +205,7 @@ def minres(A, b, x0=None, shift=0.0, tol=1e-5, maxiter=None,
         beta = inner(r2.conjugate(), y)
         if beta < 0.:
             raise ValueError('non-symmetric matrix')
-        beta = sqrt(beta)
+        beta = sqrt(abs(beta))
         tnorm2 += alfa**2 + oldb**2 + beta**2
 
         if itn == 1:
@@ -251,7 +251,7 @@ def minres(A, b, x0=None, shift=0.0, tol=1e-5, maxiter=None,
 
         # Estimate various norms and test for convergence.
 
-        Anorm = sqrt(tnorm2)
+        Anorm = sqrt(abs(tnorm2))
         ynorm = norm(x)
         epsa = Anorm * eps
         epsx = Anorm * ynorm * eps
