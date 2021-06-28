@@ -206,7 +206,7 @@ def check_convergence(solver, case):
     if A.dtype.char in "dD":
         tol = 1e-8
     elif solver is minres and (A.dtype.char == 'F'):
-        tol = 1e-8
+        tol = 1e-4
     else:
         tol = 1e-2
 
