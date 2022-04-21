@@ -92,19 +92,14 @@ def tfqmr(A, b, x0=None, tol=1e-5, maxiter=None, M=None,
     True
     """
 
-    # Check data type
-    dtype = A.dtype
-    if np.issubdtype(dtype, np.int64):
-        dtype = float
-        A = A.astype(dtype)
-    if np.issubdtype(b.dtype, np.int64):
-        b = b.astype(dtype)
-
     A, M, x, b, postprocess = make_system(A, M, x0, b)
 
     # Check if the R.H.S is a zero vector
     if np.linalg.norm(b) == 0.:
         x = b.copy()
+        if show:
+            print("TFQMR: Linear solve converged due to zero right-hand side "
+                  "iterations 0")
         return (postprocess(x), 0)
 
     ndofs = A.shape[0]
@@ -125,6 +120,9 @@ def tfqmr(A, b, x0=None, tol=1e-5, maxiter=None, M=None,
     r0norm = np.sqrt(rho)
     tau = r0norm
     if r0norm == 0:
+        if show:
+            print("TFQMR: Linear solve converged due to zero residual "
+                  "iterations 0")
         return (postprocess(x), 0)
 
     if atol is None:
